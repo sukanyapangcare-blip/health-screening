@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ระบบคัดกรองสุขภาพ สอน.บ้านเมืองใหม่ (by PP)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .text-size-sm { font-size: 0.95rem; }
+        .text-size-md { font-size: 1.15rem; }
+        .text-size-lg { font-size: 1.35rem; }
+        .print-only { display: none; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; font-size: 11pt; }
+        }
+        /* Custom scrollbar for mobile usability */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 pb-20 md:pb-12 text-size-md select-none sm:select-auto" id="app-body">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-emerald-700 text-white shadow-lg sticky top-0 z-40 no-print">
+        <div class="max-w-6xl mx-auto px-4 py-2.5 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white p-2 rounded-2xl text-emerald-700 shadow-md">
+                    <i class="fa-solid fa-hospital-user text-2xl md:text-3xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-lg md:text-2xl font-bold leading-tight">ระบบคัดกรองสุขภาพ สอน.บ้านเมืองใหม่ <span class="text-amber-300 text-sm md:text-base font-extrabold">(by PP)</span></h1>
+                    </div>
+                    <p class="text-xs md:text-sm text-emerald-100 flex items-center gap-1">
+                        <i class="fa-solid fa-location-dot"></i> กลุ่มเป้าหมายอายุ 35 ปีขึ้นไป | ส่งข้อมูลเข้า Excel เจ้าหน้าที่
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Font Size & Screen Mode Controls -->
+            <div class="flex items-center space-x-1.5 bg-emerald-800/80 p-1.5 rounded-xl border border-emerald-600">
+                <span class="text-xs text-emerald-200 pl-1 hidden sm:inline"><i class="fa-solid fa-text-height mr-1"></i>ขนาดตัวหนังสือ:</span>
+                <button onclick="setFontSize('sm')" id="btn-font-sm" class="px-2 py-1 bg-emerald-700 text-white text-xs rounded hover:bg-emerald-600 font-bold transition">ปกติ</button>
+                <button onclick="setFontSize('md')" id="btn-font-md" class="px-2.5 py-1 bg-emerald-500 text-white text-sm rounded font-bold shadow transition">ใหญ่</button>
+                <button onclick="setFontSize('lg')" id="btn-font-lg" class="px-2 py-1 bg-emerald-700 text-white text-base rounded hover:bg-emerald-600 font-bold transition">ใหญ่พิเศษ</button>
+            </div>
+        </div>
+
+        <!-- Desktop Navigation Tabs -->
+        <div class="max-w-6xl mx-auto px-4 mt-1 hidden md:flex border-t border-emerald-600/50 overflow-x-auto">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="flex-1 min-w-[120px] py-3 text-center font-semibold border-b-4 border-amber-400 bg-emerald-800 text-white transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-chart-pie"></i> หน้าหลัก
+            </button>
+            <button onclick="switchTab('form')" id="tab-form" class="flex-1 min-w-[140px] py-3 text-center font-semibold border-b-4 border-transparent text-emerald-100 hover:bg-emerald-800/50 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-signature"></i> คัดกรองใหม่
+            </button>
+            <button onclick="switchTab('list')" id="tab-list" class="flex-1 min-w-[140px] py-3 text-center font-semibold border-b-4 border-transparent text-emerald-100 hover:bg-emerald-800/50 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-address-book"></i> รายชื่อ / แก้ไข
+            </button>
+            <button onclick="switchTab('export')" id="tab-export" class="flex-1 min-w-[150px] py-3 text-center font-semibold border-b-4 border-transparent text-emerald-100 hover:bg-emerald-800/50 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-excel"></i> ส่ง Excel เจ้าหน้าที่
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-2xl z-50 no-print flex justify-around items-center py-2 px-1">
+        <button onclick="switchTab('dashboard')" id="mobile-tab-dashboard" class="flex flex-col items-center justify-center w-1/4 text-emerald-700 font-bold text-xs py-1">
+            <i class="fa-solid fa-chart-pie text-xl mb-0.5"></i>
+            <span>หน้าหลัก</span>
+        </button>
+        <button onclick="switchTab('form')" id="mobile-tab-form" class="flex flex-col items-center justify-center w-1/4 text-slate-500 font-medium text-xs py-1">
+            <i class="fa-solid fa-plus-circle text-xl mb-0.5"></i>
+            <span>คัดกรอง</span>
+        </button>
+        <button onclick="switchTab('list')" id="mobile-tab-list" class="flex flex-col items-center justify-center w-1/4 text-slate-500 font-medium text-xs py-1">
+            <i class="fa-solid fa-address-book text-xl mb-0.5"></i>
+            <span>รายชื่อ</span>
+        </button>
+        <button onclick="switchTab('export')" id="mobile-tab-export" class="flex flex-col items-center justify-center w-1/4 text-slate-500 font-medium text-xs py-1">
+            <i class="fa-solid fa-file-excel text-xl mb-0.5"></i>
+            <span>ส่ง Excel</span>
+        </button>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-3 sm:px-4 mt-4 no-print">
+
+        <!-- VIEW 1: DASHBOARD -->
+        <section id="view-dashboard" class="space-y-5">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-5 rounded-2xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 bg-emerald-900/60 px-3 py-1 rounded-full text-xs text-emerald-200 font-semibold mb-2">
+                        <i class="fa-solid fa-mobile-screen-button"></i> รองรับสมาร์ทโฟนและแท็บเล็ต 100%
+                    </div>
+                    <h2 class="text-xl md:text-2xl font-bold">สวัสดี อสม. สอน.บ้านเมืองใหม่ 👋</h2>
+                    <p class="text-emerald-100 text-sm mt-1">ระบบบันทึกผลคัดกรองเบาหวาน-ความดัน ข้อมูลจัดเก็บพร้อมส่งออกให้เจ้าหน้าที่ในรูปแบบ Excel ได้ทันที</p>
+                </div>
+                <button onclick="openNewForm()" class="bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold py-3.5 px-6 rounded-xl shadow-lg transition flex items-center gap-2 text-base md:text-lg w-full md:w-auto justify-center active:scale-95">
+                    <i class="fa-solid fa-circle-plus text-xl"></i> เริ่มคัดกรองรายใหม่
+                </button>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 border-l-8 border-l-blue-500">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 font-bold text-xs sm:text-sm">คัดกรองแล้ว</span>
+                        <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-users"></i></div>
+                    </div>
+                    <div class="mt-2 flex items-baseline gap-1">
+                        <span id="stat-total" class="text-3xl font-extrabold text-slate-800">0</span>
+                        <span class="text-xs text-slate-500 font-medium">คน</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 border-l-8 border-l-emerald-500">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 font-bold text-xs sm:text-sm">กลุ่มปกติ</span>
+                        <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-heart-pulse"></i></div>
+                    </div>
+                    <div class="mt-2 flex items-baseline gap-1">
+                        <span id="stat-normal" class="text-3xl font-extrabold text-emerald-600">0</span>
+                        <span class="text-xs text-slate-500 font-medium">คน</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 border-l-8 border-l-amber-500">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 font-bold text-xs sm:text-sm">กลุ่มเสี่ยง</span>
+                        <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    </div>
+                    <div class="mt-2 flex items-baseline gap-1">
+                        <span id="stat-risk" class="text-3xl font-extrabold text-amber-600">0</span>
+                        <span class="text-xs text-slate-500 font-medium">คน</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 border-l-8 border-l-rose-500">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 font-bold text-xs sm:text-sm">สงสัยป่วย/ส่งต่อ</span>
+                        <div class="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center"><i class="fa-solid fa-hospital"></i></div>
+                    </div>
+                    <div class="mt-2 flex items-baseline gap-1">
+                        <span id="stat-high" class="text-3xl font-extrabold text-rose-600">0</span>
+                        <span class="text-xs text-slate-500 font-medium">คน</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Excel Action for Health Officers -->
+            <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-2xl shrink-0">
+                        <i class="fa-solid fa-file-excel"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-emerald-950 text-base sm:text-lg">ไฟล์ Excel สำหรับเจ้าหน้าที่ สอน.บ้านเมืองใหม่</h3>
+                        <p class="text-xs sm:text-sm text-emerald-700">กดดาวน์โหลดเพื่อส่งไฟล์บันทึกข้อมูลย้อนหลังให้เจ้าหน้าที่ รพ.สต./สอน.</p>
+                    </div>
+                </div>
+                <button onclick="exportToCSV()" class="w-full sm:w-auto bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 px-5 rounded-xl shadow transition flex items-center justify-center gap-2 shrink-0 text-sm sm:text-base">
+                    <i class="fa-solid fa-download"></i> โหลด Excel (CSV)
+                </button>
+            </div>
+
+            <!-- Recent Records Dashboard Widget -->
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-emerald-600"></i> รายการคัดกรองล่าสุด
+                    </h3>
+                    <button onclick="switchTab('list')" class="text-emerald-700 hover:text-emerald-800 font-bold text-sm hover:underline">ดูทั้งหมด &rarr;</button>
+                </div>
+                <div id="recent-list-container" class="space-y-3">
+                    <!-- Dynamic Recent List -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: SCREENING FORM -->
+        <section id="view-form" class="hidden space-y-5">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="border-b border-slate-200 pb-4 mb-5 flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h2 id="form-title" class="text-xl sm:text-2xl font-bold text-emerald-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-user"></i> แบบคัดกรองสุขภาพ (สอน.บ้านเมืองใหม่)
+                        </h2>
+                        <p class="text-slate-500 text-xs sm:text-sm mt-1">กลุ่มเป้าหมายอายุ 35 ปีขึ้นไป คำนวณความเสี่ยงและ BMI อัตโนมัติ</p>
+                    </div>
+                    <span id="edit-badge" class="hidden bg-amber-100 text-amber-800 border border-amber-300 font-bold px-3 py-1 rounded-full text-xs sm:text-sm">
+                        <i class="fa-solid fa-pen"></i> กำลังแก้ไขข้อมูล
+                    </span>
+                </div>
+
+                <form id="health-form" onsubmit="saveRecord(event)" class="space-y-6">
+                    <input type="hidden" id="record-id">
+
+                    <!-- หมวดที่ 1: ข้อมูลส่วนบุคคล -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-800 border-l-4 border-emerald-600 pl-3 flex items-center gap-2">
+                            <i class="fa-solid fa-id-card text-emerald-600"></i> 1. ข้อมูลส่วนบุคคล
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                            <div>
+                                <label class="block font-bold text-slate-700 text-sm mb-1">เลขบัตรประชาชน (13 หลัก) <span class="text-rose-500">*</span></label>
+                                <input type="inputmode-numeric" id="citizen-id" required pattern="[0-9]{13}" maxlength="13" placeholder="เช่น 1429900123456" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-sm mb-1">ชื่อ - นามสกุล <span class="text-rose-500">*</span></label>
+                                <input type="text" id="fullname" required placeholder="นายสมชาย ใจดี" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-sm mb-1">เพศ <span class="text-rose-500">*</span></label>
+                                <select id="gender" required class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg bg-white">
+                                    <option value="ชาย">ชาย</option>
+                                    <option value="หญิง">หญิง</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-sm mb-1">อายุ (ปี) <span class="text-rose-500">* (35 ปีขึ้นไป)</span></label>
+                                <input type="number" id="age" min="35" max="120" required placeholder="35" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-sm mb-1">หมู่ที่ <span class="text-rose-500">*</span></label>
+                                <input type="number" id="village-no" required min="1" placeholder="เช่น 1" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-sm mb-1">เบอร์โทรศัพท์</label>
+                                <input type="tel" id="phone" placeholder="0812345678" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- หมวดที่ 2: สัญญาณชีพและผลตรวจกายภาพ -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-800 border-l-4 border-emerald-600 pl-3 flex items-center gap-2">
+                            <i class="fa-solid fa-weight-scale text-emerald-600"></i> 2. การวัดร่างกาย สัญญาณชีพ และเจาะเลือด
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs sm:text-sm mb-1">น้ำหนัก (กก.)</label>
+                                <input type="number" step="0.1" id="weight" oninput="calculateBMI()" placeholder="65.5" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs sm:text-sm mb-1">ส่วนสูง (ซม.)</label>
+                                <input type="number" step="0.1" id="height" oninput="calculateBMI()" placeholder="165" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs sm:text-sm mb-1">รอบเอว (ซม.)</label>
+                                <input type="number" step="0.1" id="waist" placeholder="82" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                            <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 flex flex-col justify-center col-span-1">
+                                <span class="text-xs font-semibold text-emerald-800">ค่า BMI:</span>
+                                <span id="bmi-display" class="text-xl sm:text-2xl font-extrabold text-emerald-700">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Blood Pressure & Blood Sugar -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-2">
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs sm:text-sm mb-1">ความดันตัวบน (Systolic) <span class="text-xs text-slate-500">(mmHg)</span></label>
+                                <input type="number" id="sys-bp" placeholder="120" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs sm:text-sm mb-1">ความดันตัวล่าง (Diastolic) <span class="text-xs text-slate-500">(mmHg)</span></label>
+                                <input type="number" id="dia-bp" placeholder="80" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 text-xs sm:text-sm mb-1">ระดับน้ำตาลปลายนิ้ว (FBS) <span class="text-xs text-slate-500">(mg/dL)</span></label>
+                                <input type="number" id="fbs" placeholder="95" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-base sm:text-lg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- หมวดที่ 3: พฤติกรรมและประวัติครอบครัว -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-800 border-l-4 border-emerald-600 pl-3 flex items-center gap-2">
+                            <i class="fa-solid fa-notes-medical text-emerald-600"></i> 3. ประวัติพฤติกรรมและครอบครัว
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-1.5">
+                                <label class="block font-bold text-slate-700 text-sm">ประวัติเบาหวาน/ความดัน ในครอบครัว</label>
+                                <div class="flex gap-3">
+                                    <label class="flex items-center gap-2 cursor-pointer bg-white p-3 rounded-xl border w-full">
+                                        <input type="radio" name="family_history" value="no" checked class="w-5 h-5 text-emerald-600"> ไม่มี
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer bg-white p-3 rounded-xl border w-full">
+                                        <input type="radio" name="family_history" value="yes" class="w-5 h-5 text-emerald-600"> มี (พ่อ/แม่/พี่น้อง)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block font-bold text-slate-700 text-sm">การสูบบุหรี่</label>
+                                <select id="smoking" class="w-full p-3 border border-slate-300 rounded-xl bg-white text-base sm:text-lg">
+                                    <option value="ไม่เคยสูบ">ไม่เคยสูบ</option>
+                                    <option value="สูบบางครั้ง">สูบบางครั้ง / นานๆ ครั้ง</option>
+                                    <option value="สูบประจำ">สูบประจำ</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block font-bold text-slate-700 text-sm">การดื่มเครื่องดื่มแอลกอฮอล์</label>
+                                <select id="alcohol" class="w-full p-3 border border-slate-300 rounded-xl bg-white text-base sm:text-lg">
+                                    <option value="ไม่เคยดื่ม">ไม่เคยดื่ม</option>
+                                    <option value="ดื่มบางครั้ง">ดื่มบางครั้ง</option>
+                                    <option value="ดื่มประจำ">ดื่มประจำ</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block font-bold text-slate-700 text-sm">การออกกำลังกาย</label>
+                                <select id="exercise" class="w-full p-3 border border-slate-300 rounded-xl bg-white text-base sm:text-lg">
+                                    <option value="สม่ำเสมอ">สม่ำเสมอ (&ge; 3 วัน/สัปดาห์)</option>
+                                    <option value="น้อยครั้ง">นานๆ ครั้ง</option>
+                                    <option value="ไม่ออกกำลังกาย">ไม่ออกกำลังกายเลย</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition text-lg flex items-center justify-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลคัดกรอง
+                        </button>
+                        <button type="button" onclick="resetForm()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3.5 px-6 rounded-xl transition text-base flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-xmark"></i> ยกเลิก / ล้างฟอร์ม
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW 3: RECORDS LIST & EDITING -->
+        <section id="view-list" class="hidden space-y-5">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4 mb-5">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-address-book text-emerald-600"></i> รายชื่อผู้ได้รับการคัดกรอง (สอน.บ้านเมืองใหม่)
+                        </h2>
+                        <p class="text-slate-500 text-xs sm:text-sm mt-1">สามารถแก้ไขข้อมูล หรือเลือกรายเคสเพื่อส่งให้เจ้าหน้าที่ได้</p>
+                    </div>
+
+                    <!-- Search & Filter Controls -->
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <div class="relative flex-1 min-w-[180px]">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-400"></i>
+                            <input type="text" id="search-input" oninput="renderRecordsTable()" placeholder="ค้นหาชื่อ หรือ เลขบัตร..." class="w-full pl-9 pr-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                        <select id="filter-risk" onchange="renderRecordsTable()" class="p-2.5 border border-slate-300 rounded-xl bg-white text-sm">
+                            <option value="all">ทุกกลุ่มผลประเมิน</option>
+                            <option value="กลุ่มปกติ">กลุ่มปกติ</option>
+                            <option value="กลุ่มเสี่ยง">กลุ่มเสี่ยง</option>
+                            <option value="กลุ่มป่วย/ส่งต่อ">กลุ่มป่วย/ส่งต่อ</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Desktop / Tablet Table View -->
+                <div class="overflow-x-auto rounded-xl border border-slate-200 hidden md:block">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold text-sm">
+                                <th class="p-3">ชื่อ - นามสกุล</th>
+                                <th class="p-3">เลขบัตรประชาชน</th>
+                                <th class="p-3">อายุ/เพศ</th>
+                                <th class="p-3">ความดัน (BP)</th>
+                                <th class="p-3">น้ำตาล (FBS)</th>
+                                <th class="p-3 text-center">สถานะความเสี่ยง</th>
+                                <th class="p-3 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-table-body" class="divide-y divide-slate-200 text-slate-700 text-sm">
+                            <!-- Dynamic Table Content -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Card List View -->
+                <div id="records-cards-mobile" class="space-y-3 md:hidden">
+                    <!-- Dynamic Mobile Cards Content -->
+                </div>
+
+                <div id="no-records-msg" class="hidden py-12 text-center text-slate-400">
+                    <i class="fa-solid fa-folder-open text-5xl mb-3"></i>
+                    <p class="text-base">ไม่พบข้อมูลการคัดกรอง</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: EXPORT DATA FOR HEALTH OFFICERS -->
+        <section id="view-export" class="hidden space-y-5">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                <div class="border-b border-slate-200 pb-4">
+                    <div class="flex items-center gap-2 text-emerald-800">
+                        <i class="fa-solid fa-file-excel text-2xl sm:text-3xl"></i>
+                        <h2 class="text-xl sm:text-2xl font-bold">ส่งออกข้อมูลให้เจ้าหน้าที่ (สอน.บ้านเมืองใหม่)</h2>
+                    </div>
+                    <p class="text-slate-500 text-xs sm:text-sm mt-1">นำข้อมูลการคัดกรองทั้งหมดออกเป็น Excel เพื่อให้เจ้าหน้าที่นำเข้าฐานข้อมูล รพ.สต./สอน.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <!-- CSV / Excel Export Option -->
+                    <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-2xl mb-3">
+                                <i class="fa-solid fa-file-excel"></i>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-bold text-emerald-950 mb-1">ส่งออกเป็นไฟล์ Excel (.csv)</h3>
+                            <p class="text-emerald-800 text-xs sm:text-sm mb-4">
+                                ไฟล์ถูกแปลงรหัสแบบ UTF-8 BOM สำหรับเปิดใน <strong>Microsoft Excel</strong> ภาษาไทยได้ทันที โดยไม่มีปัญหาตัวอักษรต่างดาว
+                            </p>
+                        </div>
+                        <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-xl shadow transition flex items-center justify-center gap-2 text-base active:scale-95">
+                            <i class="fa-solid fa-download"></i> ดาวน์โหลดไฟล์ Excel เจ้าหน้าที่
+                        </button>
+                    </div>
+
+                    <!-- JSON Backup / Import Option for Officers -->
+                    <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-slate-700 text-white flex items-center justify-center text-2xl mb-3">
+                                <i class="fa-solid fa-database"></i>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-1">สำรอง / นำเข้าไฟล์ข้อมูล</h3>
+                            <p class="text-slate-600 text-xs sm:text-sm mb-4">
+                                สำหรับเจ้าหน้าที่ รพ.สต./สอน.บ้านเมืองใหม่ ในการรวบรวมไฟล์สำรองข้อมูลจากมือถือ อสม. หลายๆ ท่านรวมกัน
+                            </p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="backupJSON()" class="flex-1 bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-3 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-file-export"></i> สำรอง JSON
+                            </button>
+                            <label class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-3 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-1 cursor-pointer text-center">
+                                <i class="fa-solid fa-file-import"></i> นำเข้าไฟล์
+                                <input type="file" id="import-file" accept=".json,.csv" onchange="importData(event)" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Print Report Card -->
+                <div class="bg-blue-50 border border-blue-200 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center text-2xl shrink-0">
+                            <i class="fa-solid fa-print"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-blue-950">พิมพ์แบบสรุปผลการคัดกรอง</h3>
+                            <p class="text-xs sm:text-sm text-blue-800">จัดรูปแบบกระดาษพิมพ์ลงลายมือชื่อ แนบส่งเจ้าหน้าที่ สอน.บ้านเมืองใหม่</p>
+                        </div>
+                    </div>
+                    <button onclick="triggerPrint()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow transition flex items-center justify-center gap-2 shrink-0 text-sm sm:text-base">
+                        <i class="fa-solid fa-print"></i> พิมพ์รายงานสรุป
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- PRINT ONLY VIEW (Hidden on screen) -->
+    <div class="print-only p-6">
+        <div class="text-center border-b-2 border-black pb-3 mb-4">
+            <h1 class="text-xl font-bold">รายงานการคัดกรองสุขภาพประชาชน อายุ 35 ปีขึ้นไป</h1>
+            <p class="text-sm font-semibold">สถานีอนามัยเฉลิมพระเกียรติฯ / รพ.สต. บ้านเมืองใหม่</p>
+            <p class="text-xs">ผู้รายงาน: อสม. ประจำหมู่บ้าน | วันที่พิมพ์: <span id="print-date"></span></p>
+        </div>
+
+        <table class="w-full border-collapse border border-black text-xs">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-black p-1 text-center">ลำดับ</th>
+                    <th class="border border-black p-1">ชื่อ-นามสกุล</th>
+                    <th class="border border-black p-1 text-center">เลขบัตรประชาชน</th>
+                    <th class="border border-black p-1 text-center">อายุ/เพศ</th>
+                    <th class="border border-black p-1 text-center">ความดัน BP</th>
+                    <th class="border border-black p-1 text-center">น้ำตาล FBS</th>
+                    <th class="border border-black p-1 text-center">ผลการประเมิน</th>
+                </tr>
+            </thead>
+            <tbody id="print-table-body">
+                <!-- Print Dynamic Rows -->
+            </tbody>
+        </table>
+
+        <div class="mt-10 flex justify-between px-6 text-center text-xs">
+            <div>
+                <p>ลงชื่อ..........................................................</p>
+                <p class="mt-1">(..........................................................)</p>
+                <p>อสม. ผู้คัดกรอง</p>
+            </div>
+            <div>
+                <p>ลงชื่อ..........................................................</p>
+                <p class="mt-1">(..........................................................)</p>
+                <p>เจ้าหน้าที่ สอน.บ้านเมืองใหม่ ผู้รับรายงาน</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail View Modal -->
+    <div id="detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden no-print">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">ผลการคัดกรองรายบุคคล</h3>
+                    <p class="text-xs text-slate-500">สอน.บ้านเมืองใหม่</p>
+                </div>
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
+            </div>
+            <div id="modal-content" class="space-y-3 text-sm">
+                <!-- Dynamic Content -->
+            </div>
+            <div class="border-t pt-3 flex flex-col sm:flex-row justify-between gap-2">
+                <button id="btn-share-line" onclick="shareToOfficer()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-share-nodes"></i> ส่งสรุปเคสให้เจ้าหน้าที่
+                </button>
+                <button onclick="closeDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-16 md:bottom-6 right-4 left-4 sm:left-auto sm:right-6 bg-slate-900/90 text-white px-4 py-3 rounded-2xl shadow-2xl z-50 transition transform translate-y-20 opacity-0 flex items-center gap-3 border border-slate-700">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
+        <span id="toast-message" class="font-medium text-sm">ข้อความแจ้งเตือน</span>
+    </div>
+
+    <script>
+        // Sample Initial Data for สอน.บ้านเมืองใหม่
+        const sampleData = [
+            {
+                id: '1',
+                citizenId: '1429900112233',
+                fullname: 'นายสมศักดิ์ มั่งมี',
+                gender: 'ชาย',
+                age: 58,
+                villageNo: '1',
+                phone: '0812345678',
+                weight: 68,
+                height: 165,
+                bmi: '24.98',
+                waist: 84,
+                sysBp: 125,
+                diaBp: 82,
+                fbs: 98,
+                familyHistory: 'no',
+                smoking: 'ไม่เคยสูบ',
+                alcohol: 'ไม่เคยดื่ม',
+                exercise: 'สม่ำเสมอ',
+                riskGroup: 'กลุ่มปกติ',
+                date: '2026-09-25'
+            },
+            {
+                id: '2',
+                citizenId: '1429900445566',
+                fullname: 'นางวิภาดา รักดี',
+                gender: 'หญิง',
+                age: 62,
+                villageNo: '2',
+                phone: '0898765432',
+                weight: 72,
+                height: 152,
+                bmi: '31.16',
+                waist: 88,
+                sysBp: 145,
+                diaBp: 92,
+                fbs: 118,
+                familyHistory: 'yes',
+                smoking: 'ไม่เคยสูบ',
+                alcohol: 'ไม่เคยดื่ม',
+                exercise: 'ไม่ออกกำลังกาย',
+                riskGroup: 'กลุ่มเสี่ยง',
+                date: '2026-09-28'
+            }
+        ];
+
+        let records = [];
+        let activeSelectedRecord = null;
+
+        window.onload = function() {
+            const saved = localStorage.getItem('osm_bm_health_records');
+            if (saved) {
+                try {
+                    records = JSON.parse(saved);
+                } catch(e) {
+                    records = sampleData;
+                }
+            } else {
+                records = sampleData;
+                saveToLocalStorage();
+            }
+
+            updateDashboardStats();
+            renderRecentList();
+            renderRecordsTable();
+        };
+
+        function saveToLocalStorage() {
+            localStorage.setItem('osm_bm_health_records', JSON.stringify(records));
+        }
+
+        // Navigation Switcher for Desktop and Mobile
+        function switchTab(tabName) {
+            const tabs = ['dashboard', 'form', 'list', 'export'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`view-${t}`);
+                const tabBtn = document.getElementById(`tab-${t}`);
+                const mTabBtn = document.getElementById(`mobile-tab-${t}`);
+
+                if (t === tabName) {
+                    el.classList.remove('hidden');
+                    if(tabBtn) {
+                        tabBtn.classList.add('border-amber-400', 'bg-emerald-800', 'text-white');
+                        tabBtn.classList.remove('border-transparent', 'text-emerald-100');
+                    }
+                    if(mTabBtn) {
+                        mTabBtn.classList.add('text-emerald-700', 'font-bold');
+                        mTabBtn.classList.remove('text-slate-500', 'font-medium');
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if(tabBtn) {
+                        tabBtn.classList.remove('border-amber-400', 'bg-emerald-800', 'text-white');
+                        tabBtn.classList.add('border-transparent', 'text-emerald-100');
+                    }
+                    if(mTabBtn) {
+                        mTabBtn.classList.remove('text-emerald-700', 'font-bold');
+                        mTabBtn.classList.add('text-slate-500', 'font-medium');
+                    }
+                }
+            });
+
+            if(tabName === 'dashboard') {
+                updateDashboardStats();
+                renderRecentList();
+            } else if(tabName === 'list') {
+                renderRecordsTable();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Adjust Font Size
+        function setFontSize(size) {
+            const body = document.getElementById('app-body');
+            body.classList.remove('text-size-sm', 'text-size-md', 'text-size-lg');
+            body.classList.add(`text-size-${size}`);
+
+            ['sm', 'md', 'lg'].forEach(s => {
+                const btn = document.getElementById(`btn-font-${s}`);
+                if(s === size) {
+                    btn.classList.add('bg-emerald-500', 'shadow');
+                    btn.classList.remove('bg-emerald-700');
+                } else {
+                    btn.classList.remove('bg-emerald-500', 'shadow');
+                    btn.classList.add('bg-emerald-700');
+                }
+            });
+        }
+
+        // Calculate BMI
+        function calculateBMI() {
+            const w = parseFloat(document.getElementById('weight').value);
+            const h = parseFloat(document.getElementById('height').value) / 100;
+            const display = document.getElementById('bmi-display');
+
+            if (w > 0 && h > 0) {
+                const bmi = (w / (h * h)).toFixed(2);
+                display.textContent = bmi;
+            } else {
+                display.textContent = '-';
+            }
+        }
+
+        // Evaluate Risk Level
+        function evaluateRisk(sys, dia, fbs, bmi) {
+            const sysNum = parseInt(sys) || 0;
+            const diaNum = parseInt(dia) || 0;
+            const fbsNum = parseInt(fbs) || 0;
+            const bmiNum = parseFloat(bmi) || 0;
+
+            if (sysNum >= 140 || diaNum >= 90 || fbsNum >= 126) {
+                return 'กลุ่มป่วย/ส่งต่อ';
+            }
+            if ((sysNum >= 120 && sysNum <= 139) || (diaNum >= 80 && diaNum <= 89) || (fbsNum >= 100 && fbsNum <= 125) || bmiNum >= 23) {
+                return 'กลุ่มเสี่ยง';
+            }
+            return 'กลุ่มปกติ';
+        }
+
+        function openNewForm() {
+            resetForm();
+            switchTab('form');
+        }
+
+        function resetForm() {
+            document.getElementById('health-form').reset();
+            document.getElementById('record-id').value = '';
+            document.getElementById('bmi-display').textContent = '-';
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-clipboard-user"></i> แบบคัดกรองสุขภาพ (สอน.บ้านเมืองใหม่)`;
+            document.getElementById('edit-badge').classList.add('hidden');
+        }
+
+        function saveRecord(e) {
+            e.preventDefault();
+
+            const recordId = document.getElementById('record-id').value;
+            const citizenId = document.getElementById('citizen-id').value.trim();
+            const fullname = document.getElementById('fullname').value.trim();
+            const gender = document.getElementById('gender').value;
+            const age = parseInt(document.getElementById('age').value);
+            const villageNo = document.getElementById('village-no').value;
+            const phone = document.getElementById('phone').value.trim();
+            const weight = document.getElementById('weight').value;
+            const height = document.getElementById('height').value;
+            const waist = document.getElementById('waist').value;
+            const sysBp = document.getElementById('sys-bp').value;
+            const diaBp = document.getElementById('dia-bp').value;
+            const fbs = document.getElementById('fbs').value;
+            const familyHistory = document.querySelector('input[name="family_history"]:checked').value;
+            const smoking = document.getElementById('smoking').value;
+            const alcohol = document.getElementById('alcohol').value;
+            const exercise = document.getElementById('exercise').value;
+
+            let bmi = '-';
+            if (weight && height) {
+                const hM = height / 100;
+                bmi = (weight / (hM * hM)).toFixed(2);
+            }
+
+            const riskGroup = evaluateRisk(sysBp, diaBp, fbs, bmi);
+
+            const payload = {
+                id: recordId || Date.now().toString(),
+                citizenId,
+                fullname,
+                gender,
+                age,
+                villageNo,
+                phone,
+                weight,
+                height,
+                bmi,
+                waist,
+                sysBp,
+                diaBp,
+                fbs,
+                familyHistory,
+                smoking,
+                alcohol,
+                exercise,
+                riskGroup,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            if (recordId) {
+                const index = records.findIndex(r => r.id === recordId);
+                if (index !== -1) {
+                    records[index] = payload;
+                    showToast('แก้ไขข้อมูลเรียบร้อยแล้ว');
+                }
+            } else {
+                records.unshift(payload);
+                showToast('บันทึกข้อมูลสำเร็จ ข้อมูลพร้อมส่งเจ้าหน้าที่');
+            }
+
+            saveToLocalStorage();
+            resetForm();
+            switchTab('list');
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('stat-total').textContent = records.length;
+            document.getElementById('stat-normal').textContent = records.filter(r => r.riskGroup === 'กลุ่มปกติ').length;
+            document.getElementById('stat-risk').textContent = records.filter(r => r.riskGroup === 'กลุ่มเสี่ยง').length;
+            document.getElementById('stat-high').textContent = records.filter(r => r.riskGroup === 'กลุ่มป่วย/ส่งต่อ').length;
+        }
+
+        function renderRecentList() {
+            const container = document.getElementById('recent-list-container');
+            const recents = records.slice(0, 3);
+
+            if (recents.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 py-4 text-center text-sm">ยังไม่มีข้อมูลล่าสุด</p>`;
+                return;
+            }
+
+            container.innerHTML = recents.map(r => `
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-slate-50 rounded-xl border border-slate-200 gap-2">
+                    <div>
+                        <span class="font-bold text-slate-800 text-base">${r.fullname}</span>
+                        <span class="text-xs text-slate-500 ml-1">(${r.gender}, ${r.age} ปี | หมู่ ${r.villageNo})</span>
+                        <div class="text-xs text-slate-600 mt-0.5">
+                            ความดัน: <span class="font-semibold">${r.sysBp || '-'}/${r.diaBp || '-'}</span> mmHg | 
+                            น้ำตาล: <span class="font-semibold">${r.fbs || '-'}</span> mg/dL
+                        </div>
+                    </div>
+                    <div>
+                        ${getBadgeHtml(r.riskGroup)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getBadgeHtml(risk) {
+            if (risk === 'กลุ่มปกติ') {
+                return `<span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold rounded-full text-xs inline-flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> ปกติ</span>`;
+            } else if (risk === 'กลุ่มเสี่ยง') {
+                return `<span class="px-2.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 font-bold rounded-full text-xs inline-flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> เสี่ยง</span>`;
+            } else {
+                return `<span class="px-2.5 py-0.5 bg-rose-100 text-rose-800 border border-rose-300 font-bold rounded-full text-xs inline-flex items-center gap-1"><i class="fa-solid fa-hospital"></i> ป่วย/ส่งต่อ</span>`;
+            }
+        }
+
+        function renderRecordsTable() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const filter = document.getElementById('filter-risk').value;
+
+            const filtered = records.filter(r => {
+                const matchSearch = r.fullname.toLowerCase().includes(search) || r.citizenId.includes(search);
+                const matchFilter = filter === 'all' || r.riskGroup === filter;
+                return matchSearch && matchFilter;
+            });
+
+            const tbody = document.getElementById('records-table-body');
+            const mobileCards = document.getElementById('records-cards-mobile');
+            const noRecords = document.getElementById('no-records-msg');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                mobileCards.innerHTML = '';
+                noRecords.classList.remove('hidden');
+                return;
+            }
+
+            noRecords.classList.add('hidden');
+
+            // Render Desktop Table
+            tbody.innerHTML = filtered.map(r => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-bold text-slate-800">${r.fullname}</td>
+                    <td class="p-3 text-slate-600 font-mono text-xs">${r.citizenId}</td>
+                    <td class="p-3 text-slate-600">${r.age} ปี / ${r.gender}</td>
+                    <td class="p-3">${r.sysBp ? `${r.sysBp}/${r.diaBp}` : '-'}</td>
+                    <td class="p-3">${r.fbs ? `${r.fbs} mg/dL` : '-'}</td>
+                    <td class="p-3 text-center">${getBadgeHtml(r.riskGroup)}</td>
+                    <td class="p-3 text-center space-x-1.5">
+                        <button onclick="viewDetail('${r.id}')" title="ดูรายละเอียด" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="editRecord('${r.id}')" title="แก้ไข" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg transition"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteRecord('${r.id}')" title="ลบ" class="p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Render Mobile Cards
+            mobileCards.innerHTML = filtered.map(r => `
+                <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-base">${r.fullname}</h4>
+                            <p class="text-xs text-slate-500 font-mono">บัตรประชาชน: ${r.citizenId}</p>
+                        </div>
+                        ${getBadgeHtml(r.riskGroup)}
+                    </div>
+                    <div class="text-xs text-slate-600 grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div><span class="text-slate-400">อายุ/เพศ:</span> ${r.age} ปี (${r.gender})</div>
+                        <div><span class="text-slate-400">หมู่ที่:</span> ${r.villageNo}</div>
+                        <div><span class="text-slate-400">ความดัน:</span> ${r.sysBp ? `${r.sysBp}/${r.diaBp}` : '-'}</div>
+                        <div><span class="text-slate-400">น้ำตาล:</span> ${r.fbs ? `${r.fbs}` : '-'}</div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-1 border-t border-slate-100">
+                        <button onclick="viewDetail('${r.id}')" class="px-3 py-1.5 bg-blue-50 text-blue-600 font-semibold text-xs rounded-xl hover:bg-blue-100"><i class="fa-solid fa-eye mr-1"></i> รายละเอียด</button>
+                        <button onclick="editRecord('${r.id}')" class="px-3 py-1.5 bg-amber-50 text-amber-600 font-semibold text-xs rounded-xl hover:bg-amber-100"><i class="fa-solid fa-pen mr-1"></i> แก้ไข</button>
+                        <button onclick="deleteRecord('${r.id}')" class="px-3 py-1.5 bg-rose-50 text-rose-600 font-semibold text-xs rounded-xl hover:bg-rose-100"><i class="fa-solid fa-trash mr-1"></i> ลบ</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editRecord(id) {
+            const r = records.find(item => item.id === id);
+            if (!r) return;
+
+            document.getElementById('record-id').value = r.id;
+            document.getElementById('citizen-id').value = r.citizenId;
+            document.getElementById('fullname').value = r.fullname;
+            document.getElementById('gender').value = r.gender;
+            document.getElementById('age').value = r.age;
+            document.getElementById('village-no').value = r.villageNo;
+            document.getElementById('phone').value = r.phone || '';
+            document.getElementById('weight').value = r.weight || '';
+            document.getElementById('height').value = r.height || '';
+            document.getElementById('waist').value = r.waist || '';
+            document.getElementById('sys-bp').value = r.sysBp || '';
+            document.getElementById('dia-bp').value = r.diaBp || '';
+            document.getElementById('fbs').value = r.fbs || '';
+            document.getElementById('smoking').value = r.smoking || 'ไม่เคยสูบ';
+            document.getElementById('alcohol').value = r.alcohol || 'ไม่เคยดื่ม';
+            document.getElementById('exercise').value = r.exercise || 'สม่ำเสมอ';
+
+            const familyRadios = document.getElementsByName('family_history');
+            familyRadios.forEach(radio => {
+                radio.checked = radio.value === (r.familyHistory || 'no');
+            });
+
+            calculateBMI();
+
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> แก้ไขข้อมูลการคัดกรอง (สอน.บ้านเมืองใหม่)`;
+            document.getElementById('edit-badge').classList.remove('hidden');
+
+            switchTab('form');
+        }
+
+        function viewDetail(id) {
+            const r = records.find(item => item.id === id);
+            if (!r) return;
+            activeSelectedRecord = r;
+
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border">
+                        <span class="font-bold text-slate-700">ผลประเมิน:</span>
+                        <div>${getBadgeHtml(r.riskGroup)}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                        <p><strong>ชื่อ-สกุล:</strong> ${r.fullname}</p>
+                        <p><strong>เลขบัตร:</strong> ${r.citizenId}</p>
+                        <p><strong>เพศ/อายุ:</strong> ${r.gender} / ${r.age} ปี</p>
+                        <p><strong>หมู่ที่:</strong> ${r.villageNo}</p>
+                        <p><strong>เบอร์โทร:</strong> ${r.phone || '-'}</p>
+                        <p><strong>วันที่คัดกรอง:</strong> ${r.date}</p>
+                    </div>
+                    <hr class="my-1">
+                    <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                        <p><strong>น้ำหนัก/ส่วนสูง:</strong> ${r.weight || '-'} กก. / ${r.height || '-'} ซม.</p>
+                        <p><strong>ค่า BMI:</strong> ${r.bmi || '-'}</p>
+                        <p><strong>ความดัน BP:</strong> ${r.sysBp || '-'}/${r.diaBp || '-'} mmHg</p>
+                        <p><strong>น้ำตาล FBS:</strong> ${r.fbs || '-'} mg/dL</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        function deleteRecord(id) {
+            if (confirm('ยืนยันการลบข้อมูลคัดกรองรายการนี้?')) {
+                records = records.filter(r => r.id !== id);
+                saveToLocalStorage();
+                renderRecordsTable();
+                updateDashboardStats();
+                showToast('ลบข้อมูลเรียบร้อยแล้ว');
+            }
+        }
+
+        // Export CSV for Microsoft Excel with UTF-8 BOM
+        function exportToCSV() {
+            if (records.length === 0) {
+                showToast('ไม่มีข้อมูลสำหรับส่งออก');
+                return;
+            }
+
+            const headers = [
+                'เลขบัตรประชาชน', 'ชื่อ-นามสกุล', 'เพศ', 'อายุ', 'หมู่ที่', 'เบอร์โทรศัพท์',
+                'น้ำหนัก', 'ส่วนสูง', 'BMI', 'รอบเอว', 'ความดันตัวบน', 'ความดันตัวล่าง',
+                'ระดับน้ำตาล', 'ประวัติครอบครัว', 'สูบบุหรี่', 'ดื่มแอลกอฮอล์', 'ออกกำลังกาย',
+                'ผลการประเมิน', 'วันที่คัดกรอง', 'หน่วยงาน'
+            ];
+
+            const rows = records.map(r => [
+                `"${r.citizenId}"`,
+                `"${r.fullname}"`,
+                `"${r.gender}"`,
+                r.age,
+                r.villageNo,
+                `"${r.phone || ''}"`,
+                r.weight || '',
+                r.height || '',
+                r.bmi || '',
+                r.waist || '',
+                r.sysBp || '',
+                r.diaBp || '',
+                r.fbs || '',
+                `"${r.familyHistory === 'yes' ? 'มี' : 'ไม่มี'}"`,
+                `"${r.smoking}"`,
+                `"${r.alcohol}"`,
+                `"${r.exercise}"`,
+                `"${r.riskGroup}"`,
+                `"${r.date}"`,
+                `"สอน.บ้านเมืองใหม่"`
+            ]);
+
+            // Add UTF-8 BOM (\uFEFF) so Excel opens Thai language correctly
+            let csvContent = "\uFEFF" + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `ข้อมูลคัดกรอง_สอน_บ้านเมืองใหม่_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('ส่งออกไฟล์ Excel (CSV) เรียบร้อยแล้ว');
+        }
+
+        // JSON Backup
+        function backupJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(records, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `backup_osm_banmuangmai_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            showToast('สำรองข้อมูลเรียบร้อยแล้ว');
+        }
+
+        // Import File Backup
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        records = imported;
+                        saveToLocalStorage();
+                        updateDashboardStats();
+                        renderRecentList();
+                        renderRecordsTable();
+                        showToast('นำเข้าข้อมูลสำเร็จแล้ว');
+                    } else {
+                        showToast('รูปแบบไฟล์ไม่ถูกต้อง');
+                    }
+                } catch(err) {
+                    showToast('เกิดข้อผิดพลาดในการอ่านไฟล์');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Share case summary to health officer
+        function shareToOfficer() {
+            if (!activeSelectedRecord) return;
+            const r = activeSelectedRecord;
+            const text = `[คัดกรอง สอน.บ้านเมืองใหม่]\nชื่อ: ${r.fullname}\nเลขบัตร: ${r.citizenId}\nอายุ: ${r.age} ปี (หมู่ ${r.villageNo})\nBP: ${r.sysBp || '-'}/${r.diaBp || '-'} mmHg\nFBS: ${r.fbs || '-'} mg/dL\nผลประเมิน: ${r.riskGroup}`;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('คัดลอกข้อความสรุปเคสเรียบร้อย พร้อมส่งทาง LINE');
+                });
+            } else {
+                showToast('คัดลอกข้อความเรียบร้อย');
+            }
+        }
+
+        // Print Report Handler
+        function triggerPrint() {
+            document.getElementById('print-date').textContent = new Date().toLocaleDateString('th-TH');
+            const tbody = document.getElementById('print-table-body');
+            
+            tbody.innerHTML = records.map((r, index) => `
+                <tr>
+                    <td class="border border-black p-1 text-center">${index + 1}</td>
+                    <td class="border border-black p-1">${r.fullname}</td>
+                    <td class="border border-black p-1 text-center">${r.citizenId}</td>
+                    <td class="border border-black p-1 text-center">${r.age} / ${r.gender}</td>
+                    <td class="border border-black p-1 text-center">${r.sysBp ? `${r.sysBp}/${r.diaBp}` : '-'}</td>
+                    <td class="border border-black p-1 text-center">${r.fbs || '-'}</td>
+                    <td class="border border-black p-1 text-center font-bold">${r.riskGroup}</td>
+                </tr>
+            `).join('');
+
+            window.print();
+        }
+
+        // Toast Handler
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
